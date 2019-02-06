@@ -23,12 +23,22 @@ const loadImage = (uri) => new Promise((resolve, reject) => {
     var canvas = document.createElement('canvas');
     canvas.width = img.width;
     canvas.height = img.height;
-    canvas.getContext('2d').drawImage(img, 0, 0, img.width, img.height);
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, img.width, img.height);
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
 
     resolve({
       width: img.width,
       height: img.height,
-      getPixel: (x, y) => canvas.getContext('2d').getImageData(Math.floor(x), Math.floor(y), 1, 1).data,
+      getPixel: (x, y) => {
+        const i = (Math.floor(x) + Math.floor(y) * canvas.width) * 4;
+        return [
+          imageData[i],
+          imageData[i + 1],
+          imageData[i + 2],
+          imageData[i + 3],
+        ];
+      },
     });
   };
   img.src = uri;
@@ -62,22 +72,23 @@ const drawCanvas = (canvas, getPixel) => {
 
 /** Retrieve a specific pixel from a source image using the provided noise functions */
 const imageSampler = (noiseX, noiseY, image) => (x, y) => {
-  return image.getPixel(noiseX(x, y), noiseY(x, y));
+  return image.getPixel(noiseX(x, y) * image.width, noiseY(x, y) * image.height);
 };
 
 
 /** For visualizing a noise field - returns a greyscale value */
 const noiseSampler = (noise) => (x, y) => {
-  const value = noise(x, y);
+  const value = noise(x, y) * 256;
   return [value, value, value];
 };
 
 
 /** Creates a noise function with override-able settings */
-const noiseMaker = (width, height, seed, settings) => (otherSettings) => makeNoise(
+const noiseMaker = (width, height, seed, settings) => makeNoise(
   width, height,
   {
-    ...otherSettings,
+    min: 0,
+    max: 1,
     seed,
     noise: {
       ...noiseSettings.common,
@@ -114,17 +125,19 @@ const drawArt = (imageFile, seed) => {
 
   const noiseX = noiseMaker(width, height, seed, noiseSettings.x);
   const noiseY = noiseMaker(width, height, seed + 1, noiseSettings.y);
+  drawCanvas(noiseXCanvas, noiseSampler(noiseX));
+  drawCanvas(noiseYCanvas, noiseSampler(noiseY));
 
   imageLoaded.then(image => {
-    drawCanvas(noiseXCanvas, noiseSampler(noiseX({ min: 0, max: 256 })));  
-    drawCanvas(noiseYCanvas, noiseSampler(noiseY({ min: 0, max: 256 })));  
-    drawCanvas(artCanvas, imageSampler(
-      noiseX({ min: 0, max: image.width }),
-      noiseY({ min: 0, max: image.height }),
-      image
-    ));
+    drawCanvas(artCanvas, imageSampler(noiseX, noiseY, image));
   });
 };
+
+const hrefForSeed = seed => {
+  return window.location.protocol + "//" + window.location.host + window.location.pathname + `?seed=${seed}`;
+}
+
+const newSeed = () => Date.now();
 
 document.addEventListener('DOMContentLoaded', () => {
   let seed;
@@ -136,13 +149,16 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (!seed) {
-    seed = Date.now();
-    params.set('seed', seed);
+    seed = newSeed();
     if (history.pushState) {
-      var newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + `?seed=${seed}`;
+      var newurl = hrefForSeed(seed);
       window.history.pushState({ path: newurl }, '' , newurl);
     }
   }
 
   drawArt(imageFile, seed);
+
+  document.getElementById('refresh').addEventListener('click', () => {
+    window.location.href = hrefForSeed(newSeed());
+  });
 });
