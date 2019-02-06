@@ -1,6 +1,6 @@
 import { makeNoise } from './noise';
 
-const imageFile = 'scream.jpg';
+const imageFiles = ['scream.jpg', 'starry.jpg', 'puppy.jpg'];
 
 const noiseSettings = {
   common: {
@@ -97,14 +97,14 @@ const noiseMaker = (width, height, seed, settings) => makeNoise(
 );
 
 
-const drawArt = (imageFile, seed) => {
-  const imageUri = `images/${imageFile}`;
+const drawArt = (imageFiles, seed) => {
+  // const imageUri = `images/${imageFile}`;
   const [width, height] = [300, 300];
 
-  const imageContainer = document.getElementById('image-container');
-  imageContainer.style.width = `${width}px`;
-  imageContainer.style.height = `${height}px`;
-  imageContainer.style.backgroundImage = `url(${imageUri})`;
+  // const imageContainer = document.getElementById('image-container');
+  // imageContainer.style.width = `${width}px`;
+  // imageContainer.style.height = `${height}px`;
+  // imageContainer.style.backgroundImage = `url(${imageUri})`;
 
   const makeCanvas = (id) => {
     const container = document.getElementById(id);
@@ -117,18 +117,22 @@ const drawArt = (imageFile, seed) => {
   };
 
   const noiseXCanvas = makeCanvas('noise-x');
-  const noiseYCanvas = makeCanvas('noise-y');  
-  const artCanvas = makeCanvas('art');
+  const noiseYCanvas = makeCanvas('noise-y');
 
-  const imageLoaded = loadImage(imageUri);
+  const imagesLoaded = Promise.all(imageFiles.map(imageFile => loadImage(`images/${imageFile}`)));
 
   const noiseX = noiseMaker(width, height, seed, noiseSettings.x);
   const noiseY = noiseMaker(width, height, seed + 1, noiseSettings.y);
   drawCanvas(noiseXCanvas, noiseSampler(noiseX));
   drawCanvas(noiseYCanvas, noiseSampler(noiseY));
 
-  imageLoaded.then(image => {
+  const drawImage = image => {
+    const artCanvas = makeCanvas('art');
     drawCanvas(artCanvas, imageSampler(noiseX, noiseY, image));
+  };
+
+  imagesLoaded.then(images => {
+    images.forEach(drawImage);
   });
 };
 
@@ -155,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  drawArt(imageFile, seed);
+  drawArt(imageFiles, seed);
 
   document.getElementById('refresh').addEventListener('click', () => {
     window.location.href = hrefForSeed(newSeed());
