@@ -1,6 +1,6 @@
 import { makeNoise } from './noise';
 
-const imageFiles = ['scream.jpg', 'starry.jpg', 'puppy.jpg'];
+const imageFiles = ['scream.jpg', 'starry.jpg', 'puppy.jpg', 'beach.jpg', 'cat.jpeg'];
 
 const noiseSettings = {
   common: {
@@ -86,8 +86,6 @@ const noiseSampler = (noise) => (x, y) => {
 const noiseMaker = (width, height, seed, settings) => makeNoise(
   width, height,
   {
-    min: 0,
-    max: 1,
     seed,
     noise: {
       ...noiseSettings.common,
@@ -99,7 +97,7 @@ const noiseMaker = (width, height, seed, settings) => makeNoise(
 
 const drawArt = (imageFiles, seed) => {
   // const imageUri = `images/${imageFile}`;
-  const [width, height] = [300, 300];
+  const [width, height] = [600, 600];
 
   // const imageContainer = document.getElementById('image-container');
   // imageContainer.style.width = `${width}px`;
