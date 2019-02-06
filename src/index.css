@@ -5,13 +5,31 @@ html, body, .main {
 
 .main {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
 }
 
-#input {
-  /* max-height: 100px; */
-  /* max-width: 100px; */
-  /* object-fit: contain; */
+.input {
+  display: flex;
+  flex-direction: row;
+}
+
+#image-container {
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.input-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.input-container h2 {
+  margin: 0;
+  position: absolute;
+  color: white;
+  text-shadow: 0 1px 2px #000;
 }

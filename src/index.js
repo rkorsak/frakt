@@ -1,6 +1,21 @@
 import './index.css';
 import { makeNoise } from './noise';
 
+const imageFile = 'scream.jpg';
+
+const noiseSettings = {
+  common: {
+    frequency: 0.005,
+    amplitude: 1.5,
+  },
+  x: {
+    octaves: 8,
+  },
+  y: {
+    octaves: 8,
+  },
+};
+
 
 const loadImage = (uri) => new Promise((resolve, reject) => {
   var img = new Image();
@@ -13,13 +28,14 @@ const loadImage = (uri) => new Promise((resolve, reject) => {
     resolve({
       width: img.width,
       height: img.height,
-      getPixel: (x, y) => canvas.getContext('2d').getImageData(x, y, 1, 1).data,
+      getPixel: (x, y) => canvas.getContext('2d').getImageData(Math.floor(x), Math.floor(y), 1, 1).data,
     });
   };
   img.src = uri;
 });
 
 
+/** Draw to every pixel on a canvas using the provided function to determine the pixel */
 const drawCanvas = (canvas, getPixel) => {
   const { width, height } = canvas;
   const ctx = canvas.getContext('2d');
@@ -44,28 +60,20 @@ const drawCanvas = (canvas, getPixel) => {
 };
 
 
-const noiseSettings = {
-  common: {
-    frequency: 0.005,
-    amplitude: 2,
-    octaves: 2,
-  },
-  x: {},
-  y: {},
-};
-
-
+/** Retrieve a specific pixel from a source image using the provided noise functions */
 const imageSampler = (noiseX, noiseY, image) => (x, y) => {
   return image.getPixel(noiseX(x, y), noiseY(x, y));
 };
 
 
+/** For visualizing a noise field - returns a greyscale value */
 const noiseSampler = (noise) => (x, y) => {
   const value = noise(x, y);
   return [value, value, value];
 };
 
 
+/** Creates a noise function with override-able settings */
 const noiseMaker = (width, height, seed, settings) => (otherSettings) => makeNoise(
   width, height,
   {
@@ -80,14 +88,32 @@ const noiseMaker = (width, height, seed, settings) => (otherSettings) => makeNoi
 
 
 const drawArt = (imageFile, seed) => {
-  const noiseXCanvas = document.getElementById('noise-x');
-  const noiseYCanvas = document.getElementById('noise-y');  
-  const artCanvas = document.getElementById('art');
+  const imageUri = `images/${imageFile}`;
+  const [width, height] = [300, 300];
 
-  const imageLoaded = loadImage(`images/${imageFile}`);
+  const imageContainer = document.getElementById('image-container');
+  imageContainer.style.width = `${width}px`;
+  imageContainer.style.height = `${height}px`;
+  imageContainer.style.backgroundImage = `url(${imageUri})`;
 
-  const noiseX = noiseMaker(noiseXCanvas.width, noiseXCanvas.height, seed, noiseSettings.x);
-  const noiseY = noiseMaker(noiseYCanvas.width, noiseYCanvas.height, seed + 1, noiseSettings.y);
+  const makeCanvas = (id) => {
+    const container = document.getElementById(id);
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    container.appendChild(canvas);
+
+    return canvas;
+  };
+
+  const noiseXCanvas = makeCanvas('noise-x');
+  const noiseYCanvas = makeCanvas('noise-y');  
+  const artCanvas = makeCanvas('art');
+
+  const imageLoaded = loadImage(imageUri);
+
+  const noiseX = noiseMaker(width, height, seed, noiseSettings.x);
+  const noiseY = noiseMaker(width, height, seed + 1, noiseSettings.y);
 
   imageLoaded.then(image => {
     drawCanvas(noiseXCanvas, noiseSampler(noiseX({ min: 0, max: 256 })));  
@@ -100,4 +126,23 @@ const drawArt = (imageFile, seed) => {
   });
 };
 
-document.addEventListener('DOMContentLoaded', () => drawArt('puppy.jpg', Date.now()));
+document.addEventListener('DOMContentLoaded', () => {
+  let seed;
+  var query = window.location.search;
+  const params = new URLSearchParams(query);
+  const seedParam = params.get('seed');
+  if (seedParam) {
+    seed = parseInt(seedParam);
+  }
+
+  if (!seed) {
+    seed = Date.now();
+    params.set('seed', seed);
+    if (history.pushState) {
+      var newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + `?seed=${seed}`;
+      window.history.pushState({ path: newurl }, '' , newurl);
+    }
+  }
+
+  drawArt(imageFile, seed);
+});
