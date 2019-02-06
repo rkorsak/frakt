@@ -1,4 +1,3 @@
-import './index.css';
 import { makeNoise } from './noise';
 
 const imageFile = 'scream.jpg';
