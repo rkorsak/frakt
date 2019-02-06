@@ -1,0 +1,17 @@
+html, body, .main {
+  width: 100%;
+  height: 100%;
+}
+
+.main {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+#input {
+  /* max-height: 100px; */
+  /* max-width: 100px; */
+  /* object-fit: contain; */
+}

@@ -1,0 +1,24 @@
+{
+  "name": "noise-art",
+  "version": "0.0.0",
+  "description": "NOISE ART???",
+  "private": true,
+  "scripts": {
+    "start": "webpack-dev-server --open"
+  },
+  "author": "Ryan Korsak <rkorsak@gmail.com>",
+  "license": "ISC",
+  "devDependencies": {
+    "copy-webpack-plugin": "^4.6.0",
+    "css-loader": "^2.1.0",
+    "html-webpack-plugin": "^3.2.0",
+    "style-loader": "^0.23.1",
+    "webpack": "^4.29.1",
+    "webpack-cli": "^3.2.3",
+    "webpack-dev-server": "^3.1.14"
+  },
+  "dependencies": {
+    "fractal-noise": "^0.9.0",
+    "open-simplex-noise": "^1.5.0"
+  }
+}
