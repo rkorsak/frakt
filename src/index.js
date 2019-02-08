@@ -1,6 +1,6 @@
 import { makeNoise } from './noise';
 import { mutateNoise } from './mutators';
-import settings from './settings';
+import { minerality as settings } from './settings';
 
 const imageFiles = [
   'jelly.jpeg',
