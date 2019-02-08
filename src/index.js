@@ -4,14 +4,13 @@ const imageFiles = ['scream.jpg', 'starry.jpg', 'puppy.jpg', 'beach.jpg', 'cat.j
 
 const noiseSettings = {
   common: {
-    frequency: 0.005,
-    amplitude: 1.5,
+    frequency: 0.002,
+    amplitude: 1,
+    octaves: 8,
   },
   x: {
-    octaves: 8,
   },
   y: {
-    octaves: 8,
   },
 };
 
