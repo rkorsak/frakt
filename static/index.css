@@ -4,10 +4,33 @@
   align-items: center;
 }
 
+.toolbar {
+  display: flex;
+  flex-direction: row;
+  padding: 10px;
+  align-items: center;
+  justify-content: center;
+}
+
+.toolbar button {
+  flex: 1;
+  padding: 5px;
+  background: whitesmoke;
+}
+
 .input {
   display: flex;
   flex-direction: row;
-  flex-wrap: wrap;
+}
+
+.output {
+  display: flex;
+  flex-direction: column;
+}
+
+.output canvas {
+  max-width: 100%;
+  margin-top: 30px;
 }
 
 #image-container {
@@ -17,9 +40,14 @@
 }
 
 .input-container {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.input-container canvas {
+  width: 100%;
 }
 
 .input-container h2 {

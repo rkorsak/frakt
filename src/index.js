@@ -1,17 +1,40 @@
 import { makeNoise } from './noise';
 
-const imageFiles = ['scream.jpg', 'starry.jpg', 'puppy.jpg', 'beach.jpg', 'cat.jpeg'];
+const imageFiles = [
+  'jelly.jpeg',
+  'jelly-2.jpeg',
+  'hallway.jpeg',
+  'glass.jpeg',
+  'range.jpeg',
+  'leaf.jpeg',
+  'bali.jpeg',
+  'architecture.jpeg',
+  // 'scream.jpg',
+  // 'starry.jpg',
+  // 'puppy.jpg',
+  // 'cat.jpeg',
+  // 'meat.jpeg',
+  // 'mountains.jpg'
+];
 
 const noiseSettings = {
   common: {
     frequency: 0.002,
-    amplitude: 1,
+    amplitude: 2,
     octaves: 8,
   },
   x: {
+    octaves: 3,
   },
   y: {
   },
+};
+
+
+const clamp = (min, max, val) => {
+  if (val < min) return min;
+  if (val > max) return max;
+  return val;
 };
 
 
@@ -29,7 +52,9 @@ const loadImage = (uri) => new Promise((resolve, reject) => {
       width: img.width,
       height: img.height,
       getPixel: (x, y) => {
-        const i = (Math.floor(x) + Math.floor(y) * canvas.width) * 4;
+        const cleanX = clamp(0, img.width - 1, x);
+        const cleanY = clamp(0, img.height - 1, y);
+        const i = (Math.floor(cleanX) + Math.floor(cleanY) * canvas.width) * 4;
         return [
           imageData[i],
           imageData[i + 1],
@@ -96,7 +121,7 @@ const noiseMaker = (width, height, seed, settings) => makeNoise(
 
 const drawArt = (imageFiles, seed) => {
   // const imageUri = `images/${imageFile}`;
-  const [width, height] = [600, 600];
+  const [width, height] = [1024, 768];
 
   // const imageContainer = document.getElementById('image-container');
   // imageContainer.style.width = `${width}px`;
