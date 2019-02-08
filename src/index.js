@@ -1,5 +1,6 @@
 import { makeNoise } from './noise';
-import { mutateNoise, topographical, topographicalStep } from './mutators';
+import { mutateNoise } from './mutators';
+import settings from './settings';
 
 const imageFiles = [
   'jelly.jpeg',
@@ -18,33 +19,6 @@ const imageFiles = [
   // 'mountains.jpg'
 ];
 
-const settings = {
-  common: {
-    noise: {
-      frequency: 0.002,
-      amplitude: 2,
-    },
-    mutators: [
-    ],
-  },
-  x: {
-    noise: {
-      octaves: 3,
-    },
-    mutators: [
-      // topographical,
-    ],
-  },
-  y: {
-    noise: {
-      octaves: 8,
-    },
-    mutators: [
-      // topographicalStep,
-    ],
-  },
-};
-
 
 const clamp = (min, max, val) => {
   if (val < min) return min;
@@ -53,7 +27,7 @@ const clamp = (min, max, val) => {
 };
 
 
-const loadImage = (uri) => new Promise((resolve, reject) => {
+const loadImage = (uri) => new Promise(resolve => {
   var img = new Image();
   img.onload = () => {
     var canvas = document.createElement('canvas');
@@ -67,6 +41,9 @@ const loadImage = (uri) => new Promise((resolve, reject) => {
       width: img.width,
       height: img.height,
       getPixel: (x, y) => {
+        // The noise function can produce values outside of the 0-1 range if you give it higher amplitudes.
+        // Clamping the pixel sampling here to prevent sudden black pixels.
+        // An alternative is to return a transparent pixel if the value is out of range.
         const cleanX = clamp(0, img.width - 1, x);
         const cleanY = clamp(0, img.height - 1, y);
         const i = (Math.floor(cleanX) + Math.floor(cleanY) * canvas.width) * 4;
@@ -121,24 +98,17 @@ const noiseSampler = (noise) => (x, y) => {
 };
 
 
-/** Creates a noise function with override-able settings */
-const noiseMaker = (width, height, seed, localSettings) => {
+/** Creates a noise function */
+const noiseMaker = (width, height, seed, settings) => {
   const noise = makeNoise(
     width, height,
     {
       seed,
-      noise: {
-        ...settings.common.noise,
-        ...localSettings.noise,
-      },
+      noise: settings.noise,
     }
   );
 
-  const mutators = [
-    ...(settings.common.mutators || []),
-    ...(localSettings.mutators || [])
-  ];
-  return mutateNoise(noise, mutators);
+  return mutateNoise(noise, settings.mutators);
 };
 
 
