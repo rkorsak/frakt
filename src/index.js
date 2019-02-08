@@ -143,13 +143,7 @@ const noiseMaker = (width, height, seed, localSettings) => {
 
 
 const drawArt = (imageFiles, seed) => {
-  // const imageUri = `images/${imageFile}`;
   const [width, height] = [1024, 768];
-
-  // const imageContainer = document.getElementById('image-container');
-  // imageContainer.style.width = `${width}px`;
-  // imageContainer.style.height = `${height}px`;
-  // imageContainer.style.backgroundImage = `url(${imageUri})`;
 
   const makeCanvas = (id) => {
     const container = document.getElementById(id);
