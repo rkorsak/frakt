@@ -1,6 +1,9 @@
 import { makeNoise } from './noise';
 import { mutateNoise } from './mutators';
-import { minerality as settings } from './settings';
+import * as presets from './presets';
+
+const settings = presets.blobs;
+const outputDimensions = [1024, 768];
 
 const imageFiles = [
   'jelly.jpeg',
@@ -113,7 +116,7 @@ const noiseMaker = (width, height, seed, settings) => {
 
 
 const drawArt = (imageFiles, seed) => {
-  const [width, height] = [1024, 768];
+  const [width, height] = outputDimensions;
 
   const makeCanvas = (id) => {
     const container = document.getElementById(id);
