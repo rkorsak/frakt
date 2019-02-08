@@ -2,6 +2,10 @@
  * @module Higher-order noise functions that produce a new noise function by modifying an existing one.
  */
 
+export const inverse = (noiseFn) => (x, y) => {
+  return 1 - noiseFn(x, y);
+};
+
 /**
  * Modifies a noise function to appear like a topographical map, with lines drawn at certain
  * thresholds.
@@ -31,5 +35,6 @@ export const mutateNoise = (noiseFn, mutators) => {
   }
 
   const applyMutator = (fn, mutator) => mutator(fn);
-  return mutators.reverse().reduce(applyMutator, noiseFn);
+
+  return mutators.reduce(applyMutator, noiseFn);
 }

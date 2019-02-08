@@ -48,6 +48,31 @@ export const blobs = mergeSettings({
 });
 
 /**
+ * A bit of columns A and B: blobs and crunchy minerals
+ */
+export const mineralBlobs = mergeSettings({
+  noise: {
+    amplitude: 2,
+  },
+}, {
+  x: {
+    noise: {
+      octaves: 2,
+      frequency: 0.004,
+    },
+    mutators: [
+      topographicalStep,
+    ],
+  },
+  y: {
+    noise: {
+      frequency: 0.002,
+      octaves: 8,
+    },
+  },
+});
+
+/**
  * A more overtly stylized topographical map look
  */
 export const topo = mergeSettings({
@@ -63,6 +88,30 @@ export const topo = mergeSettings({
     mutators: [
       topographical,
     ],
+  },
+  y: {
+    noise: {
+      octaves: 8,
+    }
+  },
+});
+
+/**
+ * Topographical lines on both axes, with a crunchier y
+ */
+export const topoMax = mergeSettings({
+  noise: {
+    frequency: 0.002,
+    amplitude: 2,
+  },
+  mutators: [
+    topographical,
+  ],
+}, {
+  x: {
+    noise: {
+      octaves: 2,
+    },
   },
   y: {
     noise: {
