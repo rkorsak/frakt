@@ -1,4 +1,5 @@
 import { makeNoise } from './noise';
+import { mutateNoise, topographical, topographicalStep } from './mutators';
 
 const imageFiles = [
   'jelly.jpeg',
@@ -17,16 +18,30 @@ const imageFiles = [
   // 'mountains.jpg'
 ];
 
-const noiseSettings = {
+const settings = {
   common: {
-    frequency: 0.002,
-    amplitude: 2,
-    octaves: 8,
+    noise: {
+      frequency: 0.002,
+      amplitude: 2,
+    },
+    mutators: [
+    ],
   },
   x: {
-    octaves: 3,
+    noise: {
+      octaves: 3,
+    },
+    mutators: [
+      // topographical,
+    ],
   },
   y: {
+    noise: {
+      octaves: 8,
+    },
+    mutators: [
+      // topographicalStep,
+    ],
   },
 };
 
@@ -107,16 +122,24 @@ const noiseSampler = (noise) => (x, y) => {
 
 
 /** Creates a noise function with override-able settings */
-const noiseMaker = (width, height, seed, settings) => makeNoise(
-  width, height,
-  {
-    seed,
-    noise: {
-      ...noiseSettings.common,
-      ...settings,
-    },
-  }
-);
+const noiseMaker = (width, height, seed, localSettings) => {
+  const noise = makeNoise(
+    width, height,
+    {
+      seed,
+      noise: {
+        ...settings.common.noise,
+        ...localSettings.noise,
+      },
+    }
+  );
+
+  const mutators = [
+    ...(settings.common.mutators || []),
+    ...(localSettings.mutators || [])
+  ];
+  return mutateNoise(noise, mutators);
+};
 
 
 const drawArt = (imageFiles, seed) => {
@@ -143,8 +166,8 @@ const drawArt = (imageFiles, seed) => {
 
   const imagesLoaded = Promise.all(imageFiles.map(imageFile => loadImage(`images/${imageFile}`)));
 
-  const noiseX = noiseMaker(width, height, seed, noiseSettings.x);
-  const noiseY = noiseMaker(width, height, seed + 1, noiseSettings.y);
+  const noiseX = noiseMaker(width, height, seed, settings.x);
+  const noiseY = noiseMaker(width, height, seed + 1, settings.y);
   drawCanvas(noiseXCanvas, noiseSampler(noiseX));
   drawCanvas(noiseYCanvas, noiseSampler(noiseY));
 
