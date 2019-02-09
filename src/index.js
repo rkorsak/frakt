@@ -2,7 +2,7 @@ import { makeNoise } from './noise';
 import { mutateNoise } from './mutators';
 import * as presets from './presets';
 
-const settings = presets.blobs;
+const settings = presets.minerality;
 const outputDimensions = [1024, 768];
 
 const imageFiles = [
@@ -14,6 +14,10 @@ const imageFiles = [
   'leaf.jpeg',
   'bali.jpeg',
   'architecture.jpeg',
+  'architecture-2.jpeg',
+  'desert.jpeg',
+  'fog-sun.jpeg',
+  'red-room.jpeg',
   // 'scream.jpg',
   // 'starry.jpg',
   // 'puppy.jpg',
@@ -111,7 +115,9 @@ const noiseMaker = (width, height, seed, settings) => {
     }
   );
 
-  return mutateNoise(noise, settings.mutators);
+  const mutators = settings.mutators.map(m => m({ width, height }));
+
+  return mutateNoise(noise, mutators);
 };
 
 

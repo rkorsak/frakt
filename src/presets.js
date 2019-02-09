@@ -1,6 +1,25 @@
-import { topographical, topographicalStep } from './mutators';
+import {
+  imageMultiplierX,
+  imageMultiplierY,
+  topographical,
+  topographicalStep,
+  inverse,
+} from './mutators';
 
-const mergeSettings = (commonSettings, axisSettings = {}) => {
+/**
+ * @module A collection of preset settings that produce interesting results.
+ * Anatomy of a settings object:
+ * {
+ *   noise: { // Controls the raw noise function
+ *     frequency: number // Higher values produce tighter, more repetitive noise
+ *     amplitude: number // A value of 1 produces outputs in the range of 0-1.  Higher numbers produce a more varied, higher contrast output
+ *     octaves: number // Lower values are smoother and "blobbier".  Higher values are more cloud-like.
+ *   },
+ *   mutators: [] // A pipeline of functions that mutate the noise output, applied in order
+ * }
+ */
+
+export const mergeSettings = (commonSettings, axisSettings = {}) => {
   const merge = (axis = {}) => ({
     noise: { ...commonSettings.noise, ...axis.noise },
     mutators: [
@@ -117,5 +136,37 @@ export const topoMax = mergeSettings({
     noise: {
       octaves: 8,
     }
+  },
+});
+
+/**
+ * Preserves most of the original image (stretched to fit the new dimensions), but
+ * with wavy topographical lines slicing through it.
+ */
+export const imageDistort = mergeSettings({
+  noise: {
+    frequency: 0.002,
+    amplitude: 1,
+  },
+  mutators: [
+    topographical,
+    inverse,
+  ],
+}, {
+  x: {
+    noise: {
+      octaves: 2,
+    },
+    mutators: [
+      imageMultiplierX,
+    ],
+  },
+  y: {
+    noise: {
+      octaves: 8,
+    },
+    mutators: [
+      imageMultiplierY,
+    ],
   },
 });
